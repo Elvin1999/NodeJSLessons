@@ -40,6 +40,7 @@ const fs = require("fs");
 const replaceTemplate = require("./modules/replaceTemplate");
 
 var slugify = require("slugify");
+const path = require("path");
 
 const tempOverview = fs.readFileSync(
   `${__dirname}/templates/template-overview.html`,
@@ -64,7 +65,7 @@ const server = http.createServer((req, res) => {
   //const pathName = req.url;
 
   const { query, pathname } = url.parse(req.url, true);
-
+  console.log(pathname);
   // Overview page
   if (pathname === "/" || pathname === "/overview") {
     res.writeHead(200, { "Content-type": "text/html" });
@@ -80,9 +81,23 @@ const server = http.createServer((req, res) => {
   // Product Page
   else if (pathname === "/product") {
     res.writeHead(200, { "Content-type": "text/html" });
-    const product = dataObj[query.id];
-    const output = replaceTemplate(tempProduct, product);
-    res.end(output);
+    // const product = dataObj[query.id];
+    // const output = replaceTemplate(tempProduct, product);
+    // res.end(output);
+
+    const id = query.id;
+    const product = dataObj[id];
+    if (product) {
+      const output = replaceTemplate(tempProduct, product);
+      res.end(output);
+    } else {
+      res.writeHead(404, {
+        "Content-type": "text/html",
+        "my-own-header": "Hello World",
+      });
+
+      res.end('<h1 style="color:red;"> Product Not Found </h1>');
+    }
   }
   // API
   else if (pathname === "/api") {
@@ -107,3 +122,29 @@ const server = http.createServer((req, res) => {
 server.listen(27001, "127.0.0.1", () => {
   console.log("Listening to requests on port 27001");
 });
+
+
+server.on('connection',()=>{
+    console.log("Connected");
+})
+
+// console.log("Start");
+
+
+
+// setTimeout(() => {
+//     console.log('Timeout')
+// }, 2000);
+
+
+
+// setImmediate(()=>{
+//     console.log('Immediate');
+// })
+
+
+// process.nextTick(()=>{
+//     console.log("Next Tick");
+// })
+
+// console.log("End");
